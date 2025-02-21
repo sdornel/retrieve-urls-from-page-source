@@ -1,19 +1,12 @@
 {
-  "dependencies": {
-    "puppeteer": "^24.2.1"
-  },
-  "devDependencies": {
-    "electron": "^34.2.0"
-  },
-  "name": "whitelist-sites",
+  "name": "retrieve-urls-from-page-source",
   "version": "1.0.0",
-  "main": "main.js",
+  "description": "Simple script to retrieve URLs from the page source of a website. It gets around CORS by using a proxy. I also created a ruby version just for fun.",
+  "main": "index.js",
   "scripts": {
-    "start": "electron .",
-    "build": "electron-packager . WebScraperApp --platform=win32 --arch=x64 --out=dist/ --overwrite"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
-  "description": ""
+  "license": "ISC"
 }

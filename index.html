@@ -137,7 +137,7 @@
 
             try {
                 // use proxy to bypass cors
-                const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}&timestamp=${Date.now()}`;
+                const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}&timestamp=${Date.now()}`; // add timestamp to potentially avoid cache
                 // const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
                 
                 const response = await fetch(proxyUrl);

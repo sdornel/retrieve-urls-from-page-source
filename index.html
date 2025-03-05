@@ -137,12 +137,14 @@
 
             try {
                 // use proxy to bypass cors
-                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+                const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}&timestamp=${Date.now()}`;
+                // const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
                 
                 const response = await fetch(proxyUrl);
-                const data = await response.json();
-                
-                let urls = [...new Set(data.contents.match(/https?:\/\/[^\s"'>]+/g) || [])];
+                const data = await response.text();
+
+                let urls = [...new Set(data.match(/https?:\/\/[^\s"'>]+/g) || [])];
+                // let urls = [...new Set(data.contents.match(/https?:\/\/[^\s"'>]+/g) || [])];
 
                 output.innerHTML = urls.length > 0 
                     ? urls.map(link => `<a href="${link}" target="_blank">${link}</a>`).join("<br>")

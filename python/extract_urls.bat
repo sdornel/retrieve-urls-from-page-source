@@ -23,5 +23,5 @@ if not exist %VENV_DIR% (
 )
 
 echo Launching Streamlit App...
-%VENV_DIR%\Scripts\python.exe -m streamlit run extract_urls_streamlit.py
+%VENV_DIR%\Scripts\python.exe -m streamlit run extract_urls.py
 pause

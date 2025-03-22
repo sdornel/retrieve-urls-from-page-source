@@ -1,38 +1,70 @@
+from flask import Flask, request, render_template_string
 import re
 import requests
-import streamlit as st
 
-st.set_page_config(page_title="Web Page URL Extractor", layout="wide")
+app = Flask(__name__)
 
-st.title("🔗 Web Page URL Extractor")
-st.write("Enter a website URL to extract all links from the page source.")
+HTML_TEMPLATE = """
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Web Page URL Extractor</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 2em; }
+        input[type="text"] { width: 100%; padding: 0.5em; margin-bottom: 1em; }
+        .url-list { margin-top: 1em; }
+    </style>
+</head>
+<body>
+    <h1>🔗 Web Page URL Extractor</h1>
+    <p>Enter a website URL to extract all links from the page source.</p>
+    <form method="POST">
+        <input type="text" name="url" placeholder="Enter Website URL" value="{{ url or '' }}" required>
+        <button type="submit">Extract URLs</button>
+    </form>
+    {% if urls is not none %}
+        {% if urls %}
+            <div class="url-list">
+                <h3>✅ Found {{ urls|length }} URLs:</h3>
+                <ul>
+                    {% for link in urls %}
+                        <li><a href="{{ link }}" target="_blank">{{ link }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% else %}
+            <p><strong>⚠️ No URLs found.</strong></p>
+        {% endif %}
+    {% elif error %}
+        <p><strong>⚠️ {{ error }}</strong></p>
+    {% endif %}
+</body>
+</html>
+"""
 
-with st.form("url_form"):
-    url = st.text_input("Enter Website URL", "")
-    submit_button = st.form_submit_button("Extract URLs")
+@app.route("/", methods=["GET", "POST"])
+def index():
+    url = None
+    urls = None
+    error = None
 
-if submit_button:
-    if url.startswith("www"):
-        url = "https://" + url
-    elif not url.startswith("www") or not url.startswith("http"):
-        url = "https://www." + url
-    
-    st.info("Fetching URLs, please wait...")
+    if request.method == "POST":
+        url = request.form.get("url", "").strip()
 
-    try:
-        headers = {'User-Agent': 'Mozilla/5.0'}
-        response = requests.get(url, headers=headers, timeout=10)
-        response.raise_for_status()
+        if url.startswith("www"):
+            url = "https://" + url
+        elif not url.startswith("http"):
+            url = "https://www." + url
 
-        urls = sorted(set(re.findall(r'https?://[^\s"\'<>]+', response.text)))
+        try:
+            headers = {'User-Agent': 'Mozilla/5.0'}
+            response = requests.get(url, headers=headers, timeout=10)
+            response.raise_for_status()
+            urls = sorted(set(re.findall(r'https?://[^\s"\'<>]+', response.text)))
+        except requests.exceptions.RequestException as e:
+            error = f"Error fetching URL. Details: {e}"
 
-        if urls:
-            st.success(f"✅ Found {len(urls)} URLs:")
-            for link in urls:
-                st.markdown(f"- [{link}]({link})")  # Clickable links
-        else:
-            st.warning("⚠️ No URLs found.")
+    return render_template_string(HTML_TEMPLATE, url=url, urls=urls, error=error)
 
-    except requests.exceptions.RequestException as e:
-        st.error(f"⚠️ Error fetching URL. Is the URL correctly formatted?")
-        st.error(f"Error details: {e}")
+if __name__ == "__main__":
+    app.run(debug=False)

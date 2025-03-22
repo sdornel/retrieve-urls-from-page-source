@@ -1,11 +1,9 @@
 @echo off
-title Streamlit URL Extractor
+title Flask URL Extractor
 cls
 
-:: Define the virtual environment folder
 set VENV_DIR=venv
 
-:: Check if Python is installed
 where python >nul 2>nul
 if %errorlevel% neq 0 (
     echo Python is not installed. Please install Python from https://www.python.org/downloads/
@@ -13,15 +11,16 @@ if %errorlevel% neq 0 (
     exit /b
 )
 
-:: Check if the virtual environment exists
 if not exist %VENV_DIR% (
-    echo Creating a virtual environment...
+    echo Creating virtual environment...
     python -m venv %VENV_DIR%
     echo Installing dependencies in the virtual environment...
     %VENV_DIR%\Scripts\python.exe -m pip install --upgrade pip
-    %VENV_DIR%\Scripts\python.exe -m pip install streamlit requests
+    %VENV_DIR%\Scripts\python.exe -m pip install flask requests
 )
 
-echo Launching Streamlit App...
-%VENV_DIR%\Scripts\python.exe -m streamlit run extract_urls.py
+echo Launching Flask App...
+start http://localhost:5000
+%VENV_DIR%\Scripts\python.exe app.py
+
 pause
